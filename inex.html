@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gigaminute — Interactive Revenue Model</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',Arial,sans-serif;background:#f5f4f1;color:#1a1a1a;font-size:13px;line-height:1.6}
+.page{max-width:1100px;margin:0 auto;padding:32px 28px}
+.header{background:#0f2744;color:#fff;border-radius:12px;padding:32px 36px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:flex-end}
+.header-left h1{font-size:28px;font-weight:600;margin-bottom:4px}
+.header-left p{font-size:13px;color:#9ab8d4;font-weight:300}
+.header-meta{display:flex;gap:24px}
+.header-stat .hs-label{font-size:10px;color:#7fb3e8;text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px}
+.header-stat .hs-val{font-size:20px;font-weight:600;color:#fff}
+.card{background:#fff;border:1px solid #e5e2dd;border-radius:10px;padding:20px 24px;margin-bottom:16px}
+.card-title{font-size:14px;font-weight:600;color:#0f2744;margin-bottom:4px}
+.card-desc{font-size:12px;color:#888;margin-bottom:14px}
+.section-badge{display:inline-block;font-size:10px;font-weight:600;padding:3px 9px;border-radius:4px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+.sb-blue{background:#dbeafe;color:#1e40af}
+.sb-green{background:#d1fae5;color:#065f46}
+.ctrl-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 32px}
+.ctrl-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid #f0ede8}
+.ctrl-row:last-child{border-bottom:none}
+.ctrl-row label{font-size:12px;color:#555;width:170px;flex-shrink:0}
+.ctrl-row input[type=range]{flex:1;accent-color:#185FA5}
+.ctrl-row select{flex:1;font-size:12px;padding:5px 8px;border:1px solid #ddd;border-radius:5px;background:#fff;color:#1a1a1a}
+.ctrl-val{font-size:12px;font-weight:600;color:#0f2744;width:80px;text-align:right;flex-shrink:0}
+.warning{font-size:11px;color:#991b1b;background:#fee2e2;padding:4px 10px;border-radius:4px;margin-top:6px;display:none}
+.rate-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+.rate-box{background:#f7f6f3;border-radius:8px;padding:14px 16px;border:1px solid #e8e5df}
+.rate-box.premium{background:#f0faf5;border-color:#a7f3d0}
+.rb-label{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px}
+.rb-val{font-size:22px;font-weight:600;color:#0f2744;line-height:1}
+.rb-sub{font-size:11px;color:#aaa;margin-top:3px}
+.rate-box.premium .rb-val{color:#065f46}
+.metric-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.metric{background:#f7f6f3;border-radius:8px;padding:14px 16px;border:1px solid #e8e5df}
+.metric .ml{font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px}
+.metric .mv{font-size:22px;font-weight:600;color:#0f2744;line-height:1}
+.metric .ms{font-size:10px;color:#aaa;margin-top:3px}
+.metric.m-blue{background:#e6f1fb;border-color:#b5d4f4}.metric.m-blue .ml{color:#185FA5}.metric.m-blue .mv{color:#0C447C}
+.metric.m-green{background:#e8f5ee;border-color:#9FE1CB}.metric.m-green .ml{color:#0F6E56}.metric.m-green .mv{color:#085041}
+.metric.m-amber{background:#faeeda;border-color:#fac775}.metric.m-amber .ml{color:#854F0B}.metric.m-amber .mv{color:#633806}
+.metric.m-navy{background:#0f2744}.metric.m-navy .ml{color:#7fb3e8}.metric.m-navy .mv{color:#fff}.metric.m-navy .ms{color:#9ab8d4}
+.two-panel{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:#f0ede8;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#555;padding:7px 10px;text-align:right;white-space:nowrap}
+th:first-child{text-align:left}
+td{padding:7px 10px;border-bottom:1px solid #f0ede8;color:#1a1a1a;text-align:right;vertical-align:middle}
+td:first-child{text-align:left}
+tr.cat-row td{background:#0f2744;color:#7fb3e8;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:5px 10px}
+tr.total-row td{background:#f0ede8;font-weight:600;border-top:2px solid #0f2744}
+tr.hi-row td{background:#eef5ff;font-weight:600}
+tr:hover td{background:#faf9f7}
+.badge{display:inline-block;font-size:9px;font-weight:600;padding:1px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:.05em;margin-left:4px}
+.bc{background:#dbeafe;color:#1e40af}.bg{background:#d1fae5;color:#065f46}.ba{background:#fef3c7;color:#92400e}.bp{background:#f0ede8;color:#555}
+.bar-track{background:#e8e5df;border-radius:2px;height:7px;width:100%;min-width:60px;position:relative;overflow:hidden;display:inline-block;vertical-align:middle}
+.bar-fill{height:100%;border-radius:2px;position:absolute;left:0;top:0}
+hr{border:none;border-top:1px solid #e8e5df;margin:14px 0}
+.footer{text-align:center;font-size:11px;color:#aaa;margin-top:24px;padding-top:16px;border-top:1px solid #e8e5df}
+@media print{body{background:#fff}.page{padding:16px}.header,.metric.m-navy,tr.cat-row td{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="header">
+  <div class="header-left"><h1>Gigaminute — Revenue Model</h1><p>Interactive model · Base award rate + agreed premium layer · Australia & United States</p></div>
+  <div class="header-meta">
+    <div class="header-stat"><div class="hs-label">Revenue streams</div><div class="hs-val">18</div></div>
+    <div class="header-stat"><div class="hs-label">Scale range</div><div class="hs-val">5K–250K</div></div>
+    <div class="header-stat"><div class="hs-label">Markets</div><div class="hs-val">4</div></div>
+  </div>
+</div>
+<div class="card">
+  <span class="section-badge sb-blue">Section A — Base award rate</span>
+  <div class="card-desc">The legal floor. Gigaminute pays the worker at or above this rate. The platform margin is charged to the employer on every hour at this rate, plus applicable loadings.</div>
+  <div class="ctrl-grid">
+    <div>
+      <div class="ctrl-row"><label>Market</label><select id="market"><option value="aus">Australia (AUD)</option><option value="nyc" selected>New York (USD)</option><option value="fl">Florida (USD)</option><option value="tx">Texas (USD)</option></select><span class="ctrl-val"></span></div>
+      <div class="ctrl-row"><label>Sector</label><select id="sector"><option value="hosp" selected>Hospitality</option><option value="serv">Services / Retail</option><option value="cons">Construction</option></select><span class="ctrl-val"></span></div>
+      <div class="ctrl-row"><label>Workers on platform</label><select id="workers"><option value="5000">5,000</option><option value="10000" selected>10,000</option><option value="20000">20,000</option><option value="25000">25,000</option><option value="50000">50,000</option><option value="100000">100,000</option><option value="250000">250,000</option></select><span class="ctrl-val"></span></div>
+      <div class="ctrl-row"><label>Avg hours / week</label><input type="range" id="hours" min="6" max="20" value="9" step="1"><span class="ctrl-val" id="hours-out">9 hrs</span></div>
+      <div class="ctrl-row"><label>Platform margin %</label><input type="range" id="margin" min="5" max="15" value="8" step="0.5"><span class="ctrl-val" id="margin-out">8.0%</span></div>
+    </div>
+    <div>
+      <div id="aus-loadings">
+        <div style="font-size:11px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:.07em;padding:7px 0 4px">AUS penalty rates — shift type mix (must total 100%)</div>
+        <div class="ctrl-row"><label>Standard weekday</label><input type="range" id="l-std" min="0" max="100" value="55" step="5"><span class="ctrl-val" id="l-std-out">55%</span></div>
+        <div class="ctrl-row"><label>Saturday (+25%)</label><input type="range" id="l-sat" min="0" max="60" value="20" step="5"><span class="ctrl-val" id="l-sat-out">20%</span></div>
+        <div class="ctrl-row"><label>Sunday (+50%)</label><input type="range" id="l-sun" min="0" max="40" value="15" step="5"><span class="ctrl-val" id="l-sun-out">15%</span></div>
+        <div class="ctrl-row"><label>Evening (+15%)</label><input type="range" id="l-eve" min="0" max="40" value="8" step="1"><span class="ctrl-val" id="l-eve-out">8%</span></div>
+        <div class="ctrl-row"><label>Public holiday (+125%)</label><input type="range" id="l-ph" min="0" max="10" value="2" step="1"><span class="ctrl-val" id="l-ph-out">2%</span></div>
+        <div class="warning" id="aus-warn">Shift mix must total 100% — currently <span id="aus-tot"></span>%</div>
+      </div>
+      <div id="us-loadings" style="display:none">
+        <div style="font-size:11px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:.07em;padding:7px 0 4px">US shift differentials — mix (must total 100%)</div>
+        <div class="ctrl-row"><label>Standard shifts</label><input type="range" id="u-std" min="0" max="100" value="70" step="5"><span class="ctrl-val" id="u-std-out">70%</span></div>
+        <div class="ctrl-row"><label>Evening / weekend (+15%)</label><input type="range" id="u-eve" min="0" max="60" value="25" step="5"><span class="ctrl-val" id="u-eve-out">25%</span></div>
+        <div class="ctrl-row"><label>Overtime 1.5× (40h+)</label><input type="range" id="u-ot" min="0" max="20" value="5" step="1"><span class="ctrl-val" id="u-ot-out">5%</span></div>
+        <div class="warning" id="us-warn">Shift mix must total 100% — currently <span id="us-tot"></span>%</div>
+      </div>
+    </div>
+  </div>
+  <div class="rate-grid" id="base-rates"></div>
+</div>
+<div class="card">
+  <span class="section-badge sb-green">Section B — Agreed premium (upside)</span>
+  <div class="card-desc">Where employer and worker agree a rate above the award floor. The 8% platform margin applies to the full agreed rate — the premium spread generates additional margin on top of Section A. Example: award $24.95, agreed $30.00, spread $5.05, margin on spread = $0.40/hr extra.</div>
+  <div class="ctrl-grid">
+    <div>
+      <div class="ctrl-row"><label>Agreed premium above award</label><input type="range" id="premium" min="0" max="25" value="5" step="0.50"><span class="ctrl-val" id="premium-out">$5.00/hr</span></div>
+      <div class="ctrl-row"><label>% of shifts at premium</label><input type="range" id="prem-pct" min="0" max="100" value="40" step="5"><span class="ctrl-val" id="prem-pct-out">40%</span></div>
+    </div>
+    <div><div class="rate-grid" id="prem-rates" style="margin-top:0"></div></div>
+  </div>
+</div>
+<div class="card">
+  <div class="card-title">Combined revenue — all 18 streams</div>
+  <div class="metric-row" id="summary-metrics"></div>
+  <hr>
+  <div class="two-panel" id="margin-breakdown"></div>
+</div>
+<div class="card">
+  <div class="card-title">Revenue stream breakdown — annual at selected worker count</div>
+  <div style="margin-bottom:10px;font-size:11px;color:#888">Base margin and premium margin shown as separate lines.</div>
+  <div class="tbl-wrap" id="streams-table"></div>
+</div>
+<div class="card">
+  <div class="card-title">Scale extrapolation — annual revenue across all worker milestones</div>
+  <div style="margin-bottom:10px;font-size:11px;color:#888">Selected worker count highlighted with ◀</div>
+  <div class="tbl-wrap" id="scale-table"></div>
+</div>
+<div class="footer">Gigaminute — Confidential Internal Document · All figures are indicative projections · Model v2.0</div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const fmt=n=>{if(n>=1e9)return'$'+(Math.round(n/1e7)/100).toFixed(2)+'B';if(n>=1e6)return'$'+(Math.round(n/1e4)/100).toFixed(2)+'M';if(n>=1e3)return'$'+(Math.round(n/100)/10).toFixed(1)+'K';return'$'+Math.round(n).toLocaleString()};
+const fmtH=n=>'$'+(Math.round(n*100)/100).toFixed(2)+'/hr';
+const fmtN=n=>(Math.round(n*10)/10).toFixed(1);
+const AWARD={aus:{hosp:28.47,serv:24.95,cons:35.00},nyc:{hosp:19.96,serv:16.50,cons:21.00},fl:{hosp:13.00,serv:13.00,cons:17.00},tx:{hosp:10.00,serv:10.00,cons:14.00}};
+const MKTLABEL={aus:'Australia (AUD)',nyc:'New York (USD)',fl:'Florida (USD)',tx:'Texas (USD)'};
+const SECLABEL={hosp:'Hospitality',serv:'Services / Retail',cons:'Construction'};
+function getP(){
+  const market=$('market').value,sector=$('sector').value,workers=+$('workers').value,hours=+$('hours').value,marginPct=+$('margin').value,margin=marginPct/100,premium=+$('premium').value,premPct=+$('prem-pct').value/100,award=AWARD[market][sector],isAus=market==='aus';
+  let blend=1.0;
+  if(isAus){const std=+$('l-std').value/100,sat=+$('l-sat').value/100,sun=+$('l-sun').value/100,eve=+$('l-eve').value/100,ph=+$('l-ph').value/100;blend=std*1.0+sat*1.25+sun*1.50+eve*1.15+ph*2.25;const tot=Math.round((std+sat+sun+eve+ph)*100);$('aus-warn').style.display=tot!==100?'':'none';$('aus-tot').textContent=tot;}
+  else{const std=+$('u-std').value/100,eve=+$('u-eve').value/100,ot=+$('u-ot').value/100;blend=std*1.0+eve*1.15+ot*1.50;const tot=Math.round((std+eve+ot)*100);$('us-warn').style.display=tot!==100?'':'none';$('us-tot').textContent=tot;}
+  const effAward=award*blend,annualHours=hours*52,baseMarginPW=effAward*annualHours*margin,premEffective=premium*blend,premMarginPW=premEffective*annualHours*premPct*margin,agreedFull=award+premium,chargeRate=agreedFull*blend*(1+margin),grossWagesPW=effAward*annualHours;
+  return{market,sector,workers,hours,margin,marginPct,premium,premPct,award,effAward,blend,annualHours,baseMarginPW,premMarginPW,agreedFull,chargeRate,grossWagesPW,isAus};
+}
+function trailers(w,p){const gw=p.grossWagesPW*w;return{onboard:45*w,bgcheck:6*w,visa:12*0.55*w,latepay:gw*0.08*0.015,rsa:28*0.40*w,wcard:35*0.25*w,firstaid:22*0.20*w,mortgage:38*0.08*w,health:28*0.15*w,mvno:8*12*0.30*w,academy:3.50*12*w,insadmin:gw*0.012,payroll:2.50*52*w,perks:4.20*12*w,qr:1.80*6*w,emplperks:180/35*w,saas:95*12/35*w,priority:12*0.15*52*w,float:gw*(3/365)*0.045};}
+function render(){
+  const p=getP();
+  $('hours-out').textContent=p.hours+' hrs';$('margin-out').textContent=p.marginPct.toFixed(1)+'%';$('premium-out').textContent='$'+p.premium.toFixed(2)+'/hr';$('prem-pct-out').textContent=Math.round(p.premPct*100)+'%';
+  $('aus-loadings').style.display=p.isAus?'':'none';$('us-loadings').style.display=p.isAus?'none':'';
+  if(p.isAus){$('l-std-out').textContent=$('l-std').value+'%';$('l-sat-out').textContent=$('l-sat').value+'%';$('l-sun-out').textContent=$('l-sun').value+'%';$('l-eve-out').textContent=$('l-eve').value+'%';$('l-ph-out').textContent=$('l-ph').value+'%';}
+  else{$('u-std-out').textContent=$('u-std').value+'%';$('u-eve-out').textContent=$('u-eve').value+'%';$('u-ot-out').textContent=$('u-ot').value+'%';}
+  $('base-rates').innerHTML=`<div class="rate-box"><div class="rb-label">Award / minimum rate</div><div class="rb-val">${fmtH(p.award)}</div><div class="rb-sub">Legal floor · ${MKTLABEL[p.market]} · ${SECLABEL[p.sector]}</div></div><div class="rate-box"><div class="rb-label">Effective rate (with loadings)</div><div class="rb-val">${fmtH(p.effAward)}</div><div class="rb-sub">Blended loading multiplier ×${fmtN(p.blend)}</div></div><div class="rate-box"><div class="rb-label">Base margin / worker / yr</div><div class="rb-val">${fmt(p.baseMarginPW)}</div><div class="rb-sub">${p.marginPct}% × ${fmtH(p.effAward)} × ${p.hours}h × 52wk</div></div>`;
+  const smh=p.premium*p.margin;
+  $('prem-rates').innerHTML=`<div class="rate-box premium"><div class="rb-label">Agreed rate (above award)</div><div class="rb-val">${fmtH(p.agreedFull)}</div><div class="rb-sub">Award ${fmtH(p.award)} + premium ${fmtH(p.premium)}</div></div><div class="rate-box premium"><div class="rb-label">Extra margin on spread</div><div class="rb-val">${fmtH(smh)}</div><div class="rb-sub">${p.marginPct}% × ${fmtH(p.premium)} = ${fmtH(smh)} extra/hr</div></div><div class="rate-box premium"><div class="rb-label">Premium margin / worker / yr</div><div class="rb-val">${fmt(p.premMarginPW)}</div><div class="rb-sub">${Math.round(p.premPct*100)}% of shifts at agreed rate</div></div>`;
+  const T=trailers(p.workers,p),tS=T.onboard+T.bgcheck+T.visa+T.latepay+T.rsa+T.wcard+T.firstaid+T.mortgage+T.health+T.mvno+T.academy+T.insadmin+T.payroll,pS=T.perks+T.qr+T.emplperks+T.saas+T.priority+T.float,bT=p.baseMarginPW*p.workers,pT=p.premMarginPW*p.workers,grand=bT+pT+tS+pS;
+  $('summary-metrics').innerHTML=`<div class="metric m-navy"><div class="ml">Total annual revenue</div><div class="mv">${fmt(grand)}</div><div class="ms">${p.workers.toLocaleString()} workers · all 18 streams</div></div><div class="metric m-blue"><div class="ml">Base margin (award)</div><div class="mv">${fmt(bT)}</div><div class="ms">${Math.round(bT/grand*100)}% of total</div></div><div class="metric m-green"><div class="ml">Premium margin (upside)</div><div class="mv">${fmt(pT)}</div><div class="ms">${Math.round(pT/grand*100)}% · ${Math.round(p.premPct*100)}% of shifts</div></div><div class="metric m-amber"><div class="ml">Trailer + perks</div><div class="mv">${fmt(tS+pS)}</div><div class="ms">${Math.round((tS+pS)/grand*100)}% of total</div></div>`;
+  $('margin-breakdown').innerHTML=`<div><div style="font-size:11px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Per-worker annual breakdown</div><table><tbody><tr><td>Base award margin</td><td>${fmt(p.baseMarginPW)}</td></tr><tr><td>Premium spread margin</td><td style="color:#065f46;font-weight:500">${fmt(p.premMarginPW)}</td></tr><tr style="background:#f0ede8"><td style="font-weight:600">Combined placement margin</td><td style="font-weight:600">${fmt(p.baseMarginPW+p.premMarginPW)}</td></tr><tr><td style="color:#888">Trailer & compliance</td><td>${fmt(tS/p.workers)}</td></tr><tr><td style="color:#888">Perks & platform</td><td>${fmt(pS/p.workers)}</td></tr><tr style="background:#f0ede8"><td style="font-weight:600">Total per worker / year</td><td style="font-weight:600">${fmt(grand/p.workers)}</td></tr></tbody></table></div><div><div style="font-size:11px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Hourly rate structure</div><table><tbody><tr><td>Award / minimum rate</td><td>${fmtH(p.award)}</td></tr><tr><td>Effective rate (loadings)</td><td>${fmtH(p.effAward)}</td></tr><tr><td>Agreed premium</td><td style="color:#065f46">${fmtH(p.premium)}</td></tr><tr style="background:#f0ede8"><td style="font-weight:600">Full agreed rate</td><td style="font-weight:600">${fmtH(p.agreedFull)}</td></tr><tr><td>Employer charge rate</td><td style="font-weight:600;color:#0f2744">${fmtH(p.chargeRate)}</td></tr><tr style="background:#e6f1fb"><td style="font-weight:600;color:#0C447C">Gigaminute margin / hr</td><td style="font-weight:600;color:#0C447C">${fmtH(p.chargeRate*p.margin/(1+p.margin))}</td></tr></tbody></table></div>`;
+  const streams=[{cat:'Core — base award rate',name:'Platform margin on award base',badge:'bc',val:bT},{cat:'Core — agreed premium upside',name:'Platform margin on premium spread',badge:'bg',val:pT},{cat:'Core — employer-facing',name:'Worker onboarding fee',badge:'bc',val:T.onboard},{cat:'',name:'Background check margin',badge:'bc',val:T.bgcheck},{cat:'',name:'Visa / work rights verification',badge:'bc',val:T.visa},{cat:'',name:'Late payment surcharge',badge:'bc',val:T.latepay},{cat:'Trailer / compliance services',name:'RSA / alcohol cert referral',badge:'ba',val:T.rsa},{cat:'',name:'White Card / OSHA referral',badge:'ba',val:T.wcard},{cat:'',name:'First aid cert referral',badge:'ba',val:T.firstaid},{cat:'',name:'Mortgage trailer fee',badge:'ba',val:T.mortgage},{cat:'',name:'Health insurance referral',badge:'ba',val:T.health},{cat:'',name:'MVNO mobile SIM margin',badge:'ba',val:T.mvno},{cat:'',name:'Academy module licensing',badge:'ba',val:T.academy},{cat:'',name:'Insurance admin fee',badge:'ba',val:T.insadmin},{cat:'',name:'Payroll processing fee',badge:'ba',val:T.payroll},{cat:'Perks network & platform',name:'Perks partner trailing fee',badge:'bp',val:T.perks},{cat:'',name:'QR / non-member leads',badge:'bp',val:T.qr},{cat:'',name:'Employer perks listing fee',badge:'bp',val:T.emplperks},{cat:'',name:'Workforce analytics SaaS',badge:'bp',val:T.saas},{cat:'',name:'Priority placement premium',badge:'bp',val:T.priority},{cat:'',name:'Payment float income',badge:'bp',val:T.float}];
+  const maxV=Math.max(...streams.map(s=>s.val)),bL={bc:'core',bg:'premium',ba:'trailer',bp:'perks'},bC={bc:'#378ADD',bg:'#22c55e',ba:'#d97706',bp:'#888'};
+  let rows=`<table><thead><tr><th>Revenue stream</th><th style="min-width:100px">Contribution</th><th>Annual (${p.workers.toLocaleString()} workers)</th><th>Per worker</th><th>% of total</th></tr></thead><tbody>`;
+  let lc='';streams.forEach(s=>{if(s.cat&&s.cat!==lc){rows+=`<tr class="cat-row"><td colspan="5">${s.cat}</td></tr>`;lc=s.cat;}const pct=Math.round(s.val/grand*100),bar=Math.round(s.val/maxV*100);rows+=`<tr><td>${s.name}<span class="badge ${s.badge}">${bL[s.badge]}</span></td><td><div class="bar-track"><div class="bar-fill" style="width:${bar}%;background:${bC[s.badge]}"></div></div></td><td>${fmt(s.val)}</td><td>${fmt(s.val/p.workers)}</td><td>${pct}%</td></tr>`;});
+  rows+=`<tr class="total-row"><td colspan="2">Total annual revenue</td><td>${fmt(grand)}</td><td>${fmt(grand/p.workers)}</td><td>100%</td></tr></tbody></table>`;
+  $('streams-table').innerHTML=rows;
+  const scales=[5000,10000,20000,25000,50000,100000,250000];
+  let stbl=`<table><thead><tr><th>Workers</th><th>Gross wages</th><th>Base margin</th><th>Premium margin</th><th>Core total</th><th>Trailer</th><th>Perks</th><th>Grand total</th><th>Per worker</th></tr></thead><tbody>`;
+  scales.forEach(w=>{const bm=p.baseMarginPW*w,pm=p.premMarginPW*w,Ts=trailers(w,p),tr=Ts.onboard+Ts.bgcheck+Ts.visa+Ts.latepay+Ts.rsa+Ts.wcard+Ts.firstaid+Ts.mortgage+Ts.health+Ts.mvno+Ts.academy+Ts.insadmin+Ts.payroll,pk=Ts.perks+Ts.qr+Ts.emplperks+Ts.saas+Ts.priority+Ts.float,tot=bm+pm+tr+pk,gw=p.grossWagesPW*w,hi=w===p.workers;stbl+=`<tr class="${hi?'hi-row':''}"><td>${w.toLocaleString()}${hi?' ◀':''}</td><td>${fmt(gw)}</td><td>${fmt(bm)}</td><td style="color:#065f46;font-weight:${hi?'600':'400'}">${fmt(pm)}</td><td style="font-weight:500">${fmt(bm+pm)}</td><td>${fmt(tr)}</td><td>${fmt(pk)}</td><td style="font-weight:600">${fmt(tot)}</td><td>${fmt(tot/w)}</td></tr>`;});
+  stbl+='</tbody></table>';$('scale-table').innerHTML=stbl;
+}
+document.querySelectorAll('select,input').forEach(el=>el.addEventListener('input',render));
+render();
+</script>
+</body>
+</html>
